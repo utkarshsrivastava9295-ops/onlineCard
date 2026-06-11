@@ -1,0 +1,23 @@
+resource "azurerm_kubernetes_cluster" "name" {
+  name = var.cluster_name
+  location = var.location
+  resource_group_name = azurerm_resource_group.myrg.name
+  dns_prefix = "${var.cluster_name}-dnsprefix"
+  default_node_pool {
+    name = var.default_node_pool.name
+    node_count = var.default_node_pool.node_count
+    vm_size = var.default_node_pool.vm_size
+  }
+  identity {
+    type = var.cluster_identity
+  }
+  oms_agent {
+    log_analytics_workspace_id = azurerm_log_analytics_workspace.name.id
+  }
+}
+
+resource "azurerm_log_analytics_workspace" "name" {
+  name = var.log_analytics_workspace_name
+  location = var.location
+  resource_group_name = azurerm_resource_group.myrg.name
+}

@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: invite
+      POSTGRES_PASSWORD: invite123
+      POSTGRES_DB: invite_shop
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  catalog-service:
+    build: ./services/catalog-service
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: postgresql://invite:invite123@postgres:5432/catalog_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  cart-service:
+    build: ./services/cart-service
+    ports:
+      - "8002:8000"
+    environment:
+      DATABASE_URL: postgresql://invite:invite123@postgres:5432/cart_db
+      CATALOG_SERVICE_URL: http://catalog-service:8000
+    depends_on:
+      - catalog-service
+
+  address-service:
+    build: ./services/address-service
+    ports:
+      - "8004:8000"
+
+  order-service:
+    build: ./services/order-service
+    ports:
+      - "8003:8000"
+    environment:
+      DATABASE_URL: postgresql://invite:invite123@postgres:5432/order_db
+      CART_SERVICE_URL: http://cart-service:8000
+      ADDRESS_SERVICE_URL: http://address-service:8000
+      PAYMENT_SERVICE_URL: http://payment-service:8000
+      TRACKING_SERVICE_URL: http://tracking-service:8000
+    depends_on:
+      - cart-service
+      - address-service
+      - payment-service
+      - tracking-service
+
+  payment-service:
+    build: ./services/payment-service
+    ports:
+      - "8005:8000"
+    environment:
+      DATABASE_URL: postgresql://invite:invite123@postgres:5432/payment_db
+
+  tracking-service:
+    build: ./services/tracking-service
+    ports:
+      - "8006:8000"
+    environment:
+      DATABASE_URL: postgresql://invite:invite123@postgres:5432/tracking_db
+
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      CATALOG_SERVICE_URL: http://catalog-service:8000
+      CART_SERVICE_URL: http://cart-service:8000
+      ORDER_SERVICE_URL: http://order-service:8000
+      ADDRESS_SERVICE_URL: http://address-service:8000
+      PAYMENT_SERVICE_URL: http://payment-service:8000
+      TRACKING_SERVICE_URL: http://tracking-service:8000
+    depends_on:
+      - catalog-service
+      - cart-service
+      - order-service
+      - address-service
+      - payment-service
+      - tracking-service
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
