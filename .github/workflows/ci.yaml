@@ -5,17 +5,52 @@ on:
     branches:
       - develop
       - release/*
+    paths: 
+      - 'frontend/**'
+      - 'services/**'
 
 jobs:
-  lint:
+  detect-changes:
     runs-on: ubuntu-latest
 
+    outputs:
+      changed: ${{ steps.changes.outputs.changed }} 
+
     steps:
-     
-  unit-test:
+      - name: checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: identify changes
+        id: changes
+        run: |
+          git fetch origin ${{ github.ref }} --depth=1
+          changed=$(git diff --name-only origin/${{ github.ref }})
+          echo "changed=$changed" >> $GITHUB_OUTPUT
+      
+  lint:
+    needs: detect-changes
     runs-on: ubuntu-latest
-  build:
-    runs-on: ubuntu-latest
-  code-scan:
-    runs-on: ubuntu-latest
-  deploy:
+    strategy:
+      matrix:
+        service: [frontend, services/address-service, services/cart-service, services/catalog-service, services/order-service, services/payment-service, services/tracking-service]
+    if: contains(needs.detect-changes.outputs.changed, matrix.service)
+    steps:
+       - name: Checkout
+         uses: actions/checkout@v6.0.3
+
+       - name: Setup Node.js environment
+         uses: actions/setup-node@v6.4.0
+         with:
+          node-version: '20'
+
+       - name: install dependency
+         run: npm install
+         working-directory: ${{ matrix.service }}
+         
+  # unit-test:
+  #   runs-on: ubuntu-latest
+  # build:
+  #   runs-on: ubuntu-latest
+  # code-scan:
+  #   runs-on: ubuntu-latest
+  # deploy:
