@@ -1,0 +1,21 @@
+name: "Create Service Image"
+
+on:
+  push:
+    branches:
+      - develop
+      - release/*
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+     
+  unit-test:
+    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
+  code-scan:
+    runs-on: ubuntu-latest
+  deploy:
