@@ -39,8 +39,15 @@ jobs:
           fi
       
   run-pipeline:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.changed != '[]' && needs.detect-changes.outputs.changed != '' }}
     runs-on: ubuntu-latest
-    matrix:
-      strategy:
-        
+    strategy:
+      matrix:
+        working_dir: ${{ fromJson(needs.detect-changes.outputs.changed) }}
+ 
+    uses: ./.github/workflows/Templates
+    with:
+      working_dir: ${{ matrix.working_dir }}
+      service_name: ${{ matrix.working_dir == 'frontend' && 'frontend' || basename(matrix.working_dir) }}  
 
