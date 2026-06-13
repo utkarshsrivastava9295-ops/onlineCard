@@ -32,9 +32,12 @@ jobs:
             echo "No relevant services changed."
             echo "matrix=[]" >> $GITHUB_OUTPUT
           else
-            # Changed folders ki list ko JSON Array me convert karna (e.g., ["frontend", "services/service1"])
-            JSON_ARRAY=$(echo "$CHANGED_FOLDERS" | jq -R -s -c 'split("\n")[:-1]')
-            echo "Detected changes in: $JSON_ARRAY"
+            # Naya Logic: Strings ko JSON objects me convert karna
+            # Agar 'frontend' hai to path aur name dono 'frontend' honge
+            # Agar 'services/service1' hai to path 'services/service1' aur name 'service1' hoga
+            JSON_ARRAY=$(echo "$CHANGED_FOLDERS" | awk -F '/' '{print "{\"path\":\""$0"\",\"name\":\""($2==""?$1:$2)"\"}"}' | jq -s -c '.')
+            
+            echo "Detected changes: $JSON_ARRAY"
             echo "matrix=$JSON_ARRAY" >> $GITHUB_OUTPUT
           fi
       
@@ -43,10 +46,10 @@ jobs:
     if: ${{ needs.detect-changes.outputs.changed != '[]' && needs.detect-changes.outputs.changed != '' }}
     strategy:
       matrix:
-        working_dir: ${{ fromJson(needs.detect-changes.outputs.changed) }}
+        service: ${{ fromJson(needs.detect-changes.outputs.changed) }}
  
-    uses: ../.github/workflows/Templates/cicd-qualitygate.yaml
+    uses: ./.github/workflows/Templates/cicd-qualitygate.yaml
     with:
-      working_dir: ${{ matrix.working_dir }}
-      service_name: ${{ replace(matrix.working_dir, 'services/', '') }} 
+      working_dir: ${{ matrix.service.path }}
+      service_name: ${{ matrix.service.name }} 
 
