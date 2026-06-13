@@ -38,26 +38,9 @@ jobs:
             echo "matrix=$JSON_ARRAY" >> $GITHUB_OUTPUT
           fi
       
-  quality-gate:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.changed != '[]' && needs.detect-changes.outputs.changed != '' }}
+  run-pipeline:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        working_dir: ${{ fromJson(needs.detect-changes.outputs.changed) }}
-    defaults:
-      run:
-        working-directory: $( working_dir )
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
-
-      - name: Setup Runner environment
-        run: make install
-
-      - name: Linting
-        run: make lint
-
-      - name: Unit Test
-        run: make test
+    matrix:
+      strategy:
+        
 

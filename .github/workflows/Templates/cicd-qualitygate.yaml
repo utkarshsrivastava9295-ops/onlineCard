@@ -1,0 +1,33 @@
+name: Quality Gate Template
+
+on:
+  workflow_call:
+    inputs:
+      working_dir:
+        required: true
+        type: string
+        description: "Default working directory"
+
+      service_name:
+        required: true
+        type: string
+        description: "Service Name"
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_dir }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Setup Runner environment
+        run: make install
+
+      - name: Linting
+        run: make lint
+
+      - name: Unit Test
+        run: make test
