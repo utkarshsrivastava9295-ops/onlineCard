@@ -1,4 +1,4 @@
-# InviteShop — Invitation Card Shopping Platform
+# InviteShop — Invitation Card Shopping Platform 
 
 A microservices-based online invitation card shop built with **FastAPI** (backend) and **React + Vite + Tailwind** (frontend).
 
