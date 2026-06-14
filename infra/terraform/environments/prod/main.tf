@@ -8,4 +8,5 @@ module "azure" {
   cluster_name                 = var.cluster_name
   default_node_pool            = var.default_node_pool
   log_analytics_workspace_name = var.log_analytics_workspace_name
+  acr                          = var.acr
 }
