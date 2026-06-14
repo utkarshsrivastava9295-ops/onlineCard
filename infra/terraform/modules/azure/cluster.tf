@@ -24,7 +24,7 @@ resource "azurerm_log_analytics_workspace" "name" {
 
 
 resource "azurerm_container_registry" "name" {
-  for_each = var.acr
+  for_each = toset(var.acr)
 
   name = each.value
   location = var.location
@@ -34,7 +34,9 @@ resource "azurerm_container_registry" "name" {
 
 
 resource "azurerm_role_assignment" "name" {
-  scope = azurerm_container_registry.name.id
+  for_each = azurerm_container_registry.name
+
+  scope = each.value.id
   role_definition_name = "AcrPull"
   principal_id = azurerm_kubernetes_cluster.name.kubelet_identity[0].object_id
 }
