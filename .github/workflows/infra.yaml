@@ -1,0 +1,77 @@
+name: "setup infra for example app"
+
+on: 
+ workflow_dispatch:
+   inputs:
+     environment:
+       type: choice
+       default: prod
+       options:
+         - dev
+         - staging
+         - prod
+     terrafom_command:
+       type: choice
+       default: apply
+       options:
+         - apply
+         - destroy
+ push:
+   branches: 
+     - main
+     - develop
+     - release/*
+   paths: 
+     - infra/terraform/**
+
+jobs:
+  code-scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "infra/terraform/"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Scane Code
+        run: checkov -d .
+      
+  terraform-apply-plan:
+    if: inputs.terrafom_command == 'apply'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "infra/terraform/"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Terraform formate
+        run: terraform fmt
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -var-file="terraform.tfvars" -out="apply-plan.out"
+        working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+
+      - name: Scan plan file
+        run: |
+          terraform show -json apply-plan.out > apply-plan.json
+          checkov -f apply-plan.json
+        working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+
+      - name: Upload tfplan
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: tf-apply-plan
+          path: "infra/terraform/environments/${{ inputs.environment }}/apply-plan.out"
+          retention-days: 1
+
+        
+  # terraform-apply:
+  # terraform-deploy-plan:
+  # terraform-deploy:
+  
