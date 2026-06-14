@@ -1,55 +1,62 @@
-name: "Create Service Image"
+name: CI Pipeline
 
 on:
   push:
     branches:
       - develop
       - release/*
-    paths: 
+    paths:
       - 'frontend/**'
       - 'services/**'
 
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
-
     outputs:
-      changed: ${{ steps.set-matrix.outputs.matrix }} 
+      changed: ${{ steps.set-matrix.outputs.matrix }}
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 2
 
-      - name: Find changed folders and generate JSON
+      - name: Find changed folders and generate matrix
         id: set-matrix
         run: |
-          
           CHANGED_FOLDERS=$(git diff --name-only HEAD^ HEAD | grep -E '^(frontend|services/)' | awk -F '/' '{if ($1=="services") print $1"/"$2; else print $1}' | sort -u)
-          
+
           if [ -z "$CHANGED_FOLDERS" ]; then
             echo "No relevant services changed."
             echo "matrix=[]" >> $GITHUB_OUTPUT
           else
-            # Naya Logic: Strings ko JSON objects me convert karna
-            # Agar 'frontend' hai to path aur name dono 'frontend' honge
-            # Agar 'services/service1' hai to path 'services/service1' aur name 'service1' hoga
             JSON_ARRAY=$(echo "$CHANGED_FOLDERS" | awk -F '/' '{print "{\"path\":\""$0"\",\"name\":\""($2==""?$1:$2)"\"}"}' | jq -s -c '.')
-            
             echo "Detected changes: $JSON_ARRAY"
             echo "matrix=$JSON_ARRAY" >> $GITHUB_OUTPUT
           fi
-      
-  run-pipeline:
+
+  cicd-qualitygate:
     needs: detect-changes
     if: ${{ needs.detect-changes.outputs.changed != '[]' && needs.detect-changes.outputs.changed != '' }}
     strategy:
       matrix:
         service: ${{ fromJson(needs.detect-changes.outputs.changed) }}
- 
     uses: ./.github/workflows/template-cicd-qualitygate.yaml
     with:
       working_dir: ${{ matrix.service.path }}
-      service_name: ${{ matrix.service.name }} 
+      service_name: ${{ matrix.service.name }}
+
+  cicd-build:
+    needs:
+      - detect-changes
+      - cicd-qualitygate
+    if: ${{ needs.detect-changes.outputs.changed != '[]' && needs.detect-changes.outputs.changed != '' }}
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.detect-changes.outputs.changed) }}
+    uses: ./.github/workflows/template-cicd-build.yaml
+    with:
+      working_dir: ${{ matrix.service.path }}
+      image_name: ${{ matrix.service.name }}
+      image_version: ${{ github.sha }}
 
