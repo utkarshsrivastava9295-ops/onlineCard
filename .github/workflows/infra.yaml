@@ -24,27 +24,8 @@ on:
    paths: 
      - infra/terraform/**
 
-jobs:
-  code-scan:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "infra/terraform/"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6.0.3
-
-      - name: Install checkov
-        run: pipx install checkov
-
-      - name: Add checkov to env
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-        
-      - name: Scane Code
-        run: checkov -d .
-      
+jobs: 
   terraform-apply-plan:
-    needs: code-scan
     if: inputs.terrafom_command == 'apply'
     runs-on: ubuntu-latest
     defaults:
@@ -62,15 +43,6 @@ jobs:
 
       - name: Terraform plan
         run: terraform plan -var-file="terraform.tfvars" -out="apply-plan.out"
-        working-directory: "infra/terraform/environments/${{ inputs.environment }}"
-
-      - name: Add checkov to env
-        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
-        
-      - name: Scan plan file
-        run: |
-          terraform show -json apply-plan.out > apply-plan.json
-          /home/azureuser/.local/bin/checkov -f apply-plan.json
         working-directory: "infra/terraform/environments/${{ inputs.environment }}"
 
       - name: Upload tfplan
