@@ -1,0 +1,6 @@
+name: Scan Build and Publish Images
+
+
+trigger: none
+
+
