@@ -42,7 +42,8 @@
       "sourceType": "module",
       "ecmaFeatures": {
         "jsx": true
-      }
+      },
+      "jsxRuntime": "automatic"
     },
     "settings": {
       "react": {
