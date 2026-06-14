@@ -16,6 +16,7 @@ permissions:
 jobs:
   detect-changes:
     runs-on: ubuntu-latest
+    environment: github_terrafrom
     outputs:
       changed: ${{ steps.set-matrix.outputs.matrix }}
       short_sha: ${{ steps.short-sha.outputs.sha }}
