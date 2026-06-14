@@ -15,8 +15,13 @@ on:
       required: true
       type: string
 
+permissions: 
+ id-token: write
+ contents: read
+
 jobs:
   build-scane-and-publish:
+    environment: github_terrafrom
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,6 +33,13 @@ jobs:
 
       - name: Install Trivy
         run: sudo apt-get install -y trivy
+
+      - name: Azure Login
+        uses: Azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         
       - name: Build container image
         run: make build IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
