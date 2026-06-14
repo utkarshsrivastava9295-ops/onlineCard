@@ -31,7 +31,7 @@ variable "default_node_pool" {
   default = {
     name       = "default"
     node_count = 1
-    vm_size    = "Standard_B2s"
+    vm_size    = "standard_b2s_v2"
     # vm_size    = "Standard_D4s_v3"
   }
 }
