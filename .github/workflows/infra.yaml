@@ -38,6 +38,7 @@ jobs:
         run: checkov -d .
       
   terraform-apply-plan:
+    needs: code-scan
     if: inputs.terrafom_command == 'apply'
     runs-on: ubuntu-latest
     defaults:
