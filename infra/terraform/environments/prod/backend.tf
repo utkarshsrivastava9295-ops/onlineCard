@@ -4,5 +4,6 @@ terraform {
     container_name       = "terraformstate"
     resource_group_name  = "terraform-rg"
     storage_account_name = "utkarshterraformms"
+    use_oidc             = true
   }
 }
