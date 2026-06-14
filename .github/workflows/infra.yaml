@@ -78,7 +78,7 @@ jobs:
 
         
   terraform-apply:
-   environment: prod-approval, github_terrafrom
+   environment: prod-approval
    needs: terraform-apply-plan
    if: inputs.terrafom_command == 'apply'
    runs-on: ubuntu-latest
