@@ -1,4 +1,4 @@
-# InviteShop Frontend
+# InviteShop Frontend 
 
 This directory contains the frontend application for the InviteShop project.
 It is built with React, Vite, TypeScript, and Tailwind CSS.
