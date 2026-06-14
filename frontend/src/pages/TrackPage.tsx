@@ -48,8 +48,9 @@ export default function TrackPage() {
   useEffect(() => {
     const param = searchParams.get("order");
     if (param) {
-      setOrderId(param);
-      fetchTracking(param);
+      // `orderId` initial state already reads from `searchParams`.
+      // Schedule fetch on the next microtask to avoid calling setState synchronously inside this effect.
+      Promise.resolve().then(() => fetchTracking(param));
     }
   }, [searchParams]);
 
