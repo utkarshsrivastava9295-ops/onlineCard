@@ -34,6 +34,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
 
+      - name: Add checkov to env
+        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
+        
       - name: Scane Code
         run: checkov -d .
       
@@ -58,6 +61,9 @@ jobs:
         run: terraform plan -var-file="terraform.tfvars" -out="apply-plan.out"
         working-directory: "infra/terraform/environments/${{ inputs.environment }}"
 
+      - name: Add checkov to env
+        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
+        
       - name: Scan plan file
         run: |
           terraform show -json apply-plan.out > apply-plan.json
