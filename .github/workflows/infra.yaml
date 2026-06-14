@@ -35,6 +35,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
 
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+        
       - name: Terraform init
         run: terraform init
         working-directory: "infra/terraform/environments/${{ inputs.environment }}"
@@ -74,6 +77,12 @@ jobs:
        with:
          name: tf-apply-plan
          
+     - name: Install terraform
+       uses: hashicorp/setup-terraform@v2.0.3         
+
+     - name: Terraform Init
+       run: terraform init
+       
      - name: Terraform formate
        run: terraform fmt
 
