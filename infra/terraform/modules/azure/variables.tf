@@ -26,12 +26,6 @@ variable "default_node_pool" {
     node_count = number
     vm_size = string
   })
-
-  default = {
-    name = "default"
-    node_count = 1
-    vm_size = "standard_d2s_v3"
-  }
 }
 
 variable "cluster_identity" {
