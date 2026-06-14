@@ -121,6 +121,87 @@ jobs:
      - name: Apply Terraform
        run: terraform apply apply-plan.out
        
-  # terraform-deploy-plan:
-  # terraform-deploy:
+  terraform-destroy-plan:
+    if: inputs.terrafom_command == 'destroy'
+    runs-on: ubuntu-latest
+    environment: github_terrafrom
+    defaults:
+      run:
+        working-directory: "infra/terraform/"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.3
+
+      - name: Install terraform
+        uses: hashicorp/setup-terraform@v2.0.3
+
+      - name: Azure Login
+        uses: Azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        
+      - name: Terraform init
+        run: terraform init
+        working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+
+      - name: Terraform formate
+        run: terraform fmt
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -destroy -out="destroy-plan.out"
+        working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+
+      - name: Upload tfplan
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: tf-destroy-plan
+          path: "infra/terraform/environments/${{ inputs.environment }}/destroy-plan.out"
+          retention-days: 1
+          
+  terraform-deploy:
+   environment: prod-approval
+   needs: terraform-destroy-plan
+   if: inputs.terrafom_command == 'destroy'
+   runs-on: ubuntu-latest
+   defaults:
+     run:
+       working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+   steps:
+     - name: checkout
+       uses: actions/checkout@v6.0.3
+
+     - name: Download artifact tfplan
+       uses: actions/download-artifact@v7.0.0
+       with:
+         name: tf-apply-plan
+         path: "infra/terraform/environments/${{ inputs.environment }}"
+
+     - name: check dir
+       run: ls -l 
+       working-directory: "infra/terraform/environments/${{ inputs.environment }}"
+         
+     - name: Install terraform
+       uses: hashicorp/setup-terraform@v2.0.3         
+
+     - name: Azure Login
+       uses: Azure/login@v3
+       with:
+         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          
+       
+     - name: Terraform formate
+       run: terraform fmt
+
+     - name: Terraform validate
+       run: terraform validate
+       
+     - name: Apply Terraform
+       run: terraform apply -destroy destroy-plan.out    
   
