@@ -24,20 +24,20 @@ on:
    paths: 
      - infra/terraform/**
      
-permissions: 
- id-token: write
- contents: read
+# permissions: 
+#  id-token: write
+#  contents: read
  
-env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_USE_OIDC: true
-
+# env:
+#   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+#   ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+#   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+#   ARM_USE_OIDC: true
 jobs: 
   terraform-apply-plan:
     if: inputs.terrafom_command == 'apply'
     runs-on: ubuntu-latest
+    environment: github_terrafrom
     defaults:
       run:
         working-directory: "infra/terraform/"
@@ -71,7 +71,7 @@ jobs:
 
         
   terraform-apply:
-   environment: prod-approval
+   environment: prod-approval, github_terrafrom
    needs: terraform-apply-plan
    if: inputs.terrafom_command == 'apply'
    runs-on: ubuntu-latest
