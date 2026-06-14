@@ -34,11 +34,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.3
 
+      - name: Install checkov
+        run: pipx install checkov
+
       - name: Add checkov to env
-        run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
         
       - name: Scane Code
-        run: /home/azureuser/.local/bin/checkov -d .
+        run: checkov -d .
       
   terraform-apply-plan:
     needs: code-scan
