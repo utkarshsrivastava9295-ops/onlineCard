@@ -38,7 +38,7 @@ jobs:
         run: echo "/home/runner/.local/bin" >> $GITHUB_PATH
         
       - name: Scane Code
-        run: checkov -d .
+        run: /home/azureuser/.local/bin/checkov -d .
       
   terraform-apply-plan:
     needs: code-scan
@@ -67,7 +67,7 @@ jobs:
       - name: Scan plan file
         run: |
           terraform show -json apply-plan.out > apply-plan.json
-          checkov -f apply-plan.json
+          /home/azureuser/.local/bin/checkov -f apply-plan.json
         working-directory: "infra/terraform/environments/${{ inputs.environment }}"
 
       - name: Upload tfplan
