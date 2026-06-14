@@ -24,7 +24,9 @@ resource "azurerm_log_analytics_workspace" "name" {
 
 
 resource "azurerm_container_registry" "name" {
-  name = "myexampleapp"
+  for_each = var.acr
+
+  name = each.value
   location = var.location
   resource_group_name = azurerm_resource_group.myrg.name
   sku = "Basic"

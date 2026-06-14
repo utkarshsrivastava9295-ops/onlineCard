@@ -17,3 +17,4 @@ subnets = {
 }
 cluster_name                 = "myexamplecluster"
 log_analytics_workspace_name = "exampleloganalytic"
+acr = [ "frontend", "catalog" ]

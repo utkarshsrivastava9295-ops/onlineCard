@@ -28,6 +28,11 @@ variable "default_node_pool" {
   })
 }
 
+
+variable "acr" {
+  type = list(string)
+}
+
 variable "cluster_identity" {
   type = string
   default = "SystemAssigned"
