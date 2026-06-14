@@ -162,7 +162,7 @@ jobs:
           name: tf-destroy-plan
           path: "infra/terraform/environments/${{ inputs.environment }}/destroy-plan.out"
           retention-days: 1
-          
+
   terraform-deploy:
    environment: prod-approval
    needs: terraform-destroy-plan
@@ -178,7 +178,7 @@ jobs:
      - name: Download artifact tfplan
        uses: actions/download-artifact@v7.0.0
        with:
-         name: tf-apply-plan
+         name: tf-destroy-plan
          path: "infra/terraform/environments/${{ inputs.environment }}"
 
      - name: check dir
