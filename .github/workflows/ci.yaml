@@ -14,12 +14,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.set-matrix.outputs.matrix }}
+      short_sha: ${{ steps.short-sha.outputs.sha }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 2
+
+      - name: Extract short SHA
+        id: short-sha
+        run: echo "sha=${{ github.sha }}" | cut -c1-5 >> $GITHUB_OUTPUT
 
       - name: Find changed folders and generate matrix
         id: set-matrix
@@ -58,5 +63,5 @@ jobs:
     with:
       working_dir: ${{ matrix.service.path }}
       image_name: ${{ matrix.service.name }}
-      image_version: ${{ github.sha }}
+      image_version: "${{github.ref_name }}-${{ needs.detect-changes.outputs.short_sha }}"
 

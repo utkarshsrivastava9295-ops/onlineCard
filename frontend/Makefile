@@ -11,7 +11,7 @@ test:
 	npm run test
 
 build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_TAG)
+	docker build -t $(IMAGE_NAME):$(IMAGE_TAG) .
 
 scan:
 	trivy image $(IMAGE_NAME):$(IMAGE_TAG)
