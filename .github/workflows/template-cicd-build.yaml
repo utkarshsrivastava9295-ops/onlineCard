@@ -27,4 +27,7 @@ jobs:
         run: make build IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
 
       - name: Scane container image
-        run: make scane
+        run: make scane IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
+
+      - name: Publish Image
+        run: make publish

@@ -10,5 +10,12 @@ lint:
 test:
 	npm run test
 
-deploy:
+build:
 	docker build -t $(IMAGE_NAME):$(IMAGE_TAG)
+
+scan:
+	trivy image $(IMAGE_NAME):$(IMAGE_TAG)
+
+publish:
+	
+
