@@ -15,6 +15,18 @@ on:
       required: true
       type: string
 
+    client_id:
+     required: true
+     type: string
+
+    tenant_id:
+     type: string
+     required: true
+
+    subscription_id:
+     type: string
+     required: true
+
 permissions: 
  id-token: write
  contents: read
@@ -37,9 +49,9 @@ jobs:
       - name: Azure Login
         uses: Azure/login@v3
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ inputs.client_id }}
+          tenant-id: ${{ inputs.tenant_id }}
+          subscription-id: ${{ inputs.subscription_id }}
         
       - name: Build container image
         run: make build IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
