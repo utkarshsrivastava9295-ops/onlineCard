@@ -24,9 +24,9 @@ on:
    paths: 
      - infra/terraform/**
      
-# permissions: 
-#  id-token: write
-#  contents: read
+permissions: 
+ id-token: write
+ contents: read
  
 # env:
 #   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
