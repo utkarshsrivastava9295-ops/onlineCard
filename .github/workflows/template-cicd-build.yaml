@@ -1,12 +1,30 @@
-name: Build Template
+name: Build Docker Image
 
-on:
-    workflow_call:
-        input:
-            image_name: 
-            required: true
-            type: string
+on: 
+ workflow_call: 
+  inputs:
+    working_dir:
+      required: true
+      type: string
+
+    image_name:
+      required: true
+      type: string
+
+    image_version:
+      required: true
+      type: string
 
 jobs:
-    build-docker-imag:
-        - steps:
+  build-scane-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working_dir }}
+
+    steps:
+      - name: Build container image
+        run: make build IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
+
+      - name: Scane container image
+        run: make scane
