@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.3
+
+      - name: Install Trivy
+        run: pipx install trivy --yes
         
       - name: Build container image
         run: make build IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
