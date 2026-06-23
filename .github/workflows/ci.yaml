@@ -76,7 +76,8 @@ jobs:
       working_dir: ${{ matrix.service.path }}
       image_name: ${{ matrix.service.name }}
       image_version: "${{github.ref_name }}-${{ needs.detect-changes.outputs.short_sha }}"
-      client_id: ${{ secrets.AZURE_CLIENT_ID }}
-      tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-      subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
