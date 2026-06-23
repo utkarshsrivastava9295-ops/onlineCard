@@ -1,6 +1,6 @@
 IMAGE_NAME = frontend
 IMAGE_TAG = latest
-ACR_REGISTRY ?= mutkexampleappfrontend.azurecr.io
+ACR_REGISTRY ?= utkexampleappfrontend.azurecr.io
 ACR_IMAGE = $(ACR_REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG)
 
 install:
