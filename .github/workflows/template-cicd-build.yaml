@@ -56,4 +56,4 @@ jobs:
         run: make scan IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
 
       - name: Publish Image
-        run: make publish
+        run: make publish IMAGE_NAME=${{ inputs.image_name }} IMAGE_TAG=${{ inputs.image_version }}
